@@ -1,5 +1,7 @@
 # Wadling
 
+[![Gem Version](https://badge.fury.io/rb/wadling.png)](https://badge.fury.io/rb/wadling)
+
 ## Installation
 
 Add this line to your application's Gemfile:
