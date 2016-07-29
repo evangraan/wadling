@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 require 'rspec'
 require 'rspec/mocks'
 require 'tempfile'
@@ -21,9 +24,3 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
-
-SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
-SimpleCov.start do
-  add_filter "/spec/"
-end
-
