@@ -4,8 +4,6 @@ Coveralls.wear!
 require 'rspec'
 require 'rspec/mocks'
 require 'tempfile'
-require 'simplecov'
-require 'simplecov-rcov'
 #require 'byebug'
 
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'wadling'))
