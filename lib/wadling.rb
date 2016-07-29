@@ -1,7 +1,6 @@
 # http://www.w3.org/Submission/wadl/
 
 require "wadling/version"
-#require 'byebug'
 
 module Wadling
   class LexiconTranslator
@@ -51,6 +50,31 @@ module Wadling
 
     private
 
+    def validate_and_extract_method(r, v)
+      validate_resource_path(r)
+      validate_resource_definition(v)
+      method = translate_method(v['method'])
+      validate_resource_documentation(v)
+      validate_resource_id(v)
+      method
+    end
+
+    def validate_resource_path(r)
+      raise ArgumentError.new("Invalid resource path") if r.nil?
+    end
+
+    def validate_resource_definition(v)
+      raise ArgumentError.new("Resource definition invalid") if (v.nil?) or (not v.is_a?(Hash))
+    end
+
+    def validate_resource_documentation(v)
+      raise ArgumentError.new("Resource documentation invalid") if v['doc'].nil? or not v['doc'].is_a? String
+    end
+
+    def validate_resource_id(v)
+      raise ArgumentError.new("Resource id invalid") if v['id'].nil?
+    end
+
     def apply_prefix(value, prefix)
       return value if !prefix or (prefix.strip == '')
       "_#{prefix.strip}#{value}"
@@ -97,27 +121,23 @@ module Wadling
     def append_resource_footer(entries)
       entries = entries + "    </wadl:request>"
       entries = entries + "  </wadl:method>"
-      entries = entries + "</wadl:resource>"
+      entries + "</wadl:resource>"
     end
 
     def append_param(entries, required, p, vv)
-      type = parse_param(required, p, vv)
+      type = parse_param(required, vv)
       entries = entries + "      <wadl:param name=\"#{p}\" type=\"xsd:#{type}\" required=\"#{vv['required']}\" style=\"query\""
       entries = entries + " default=\"#{vv['default']}\"" if vv['default']
-      entries = entries + ">      </wadl:param>"
+      entries + ">      </wadl:param>"
     end
 
     def parse_resource(r, v)
-      raise ArgumentError.new("Invalid resource path") if r.nil?
-      raise ArgumentError.new("Resource definition invalid") if (v.nil?) or (not v.is_a?(Hash))
-      method = translate_method(v['method'])
-      raise ArgumentError.new("Resource documentation invalid") if v['doc'].nil? or not v['doc'].is_a? String
-      raise ArgumentError.new("Resource id invalid") if v['id'].nil?
+      method = validate_and_extract_method(r, v)
       required = translate_required(v['required'])
       return method, required
     end
 
-    def parse_param(required, p, vv)
+    def parse_param(required, vv)
       type = translate_type(vv['type'])
       raise ArgumentError.new("parameter should not have a default value when required") if required and not vv['default'].nil?
       type
@@ -132,12 +152,22 @@ module Wadling
     end
 
     def translate_method(method)
-      raise ArgumentError.new("Invalid method") if method.nil? or method.strip == ""
+      validate_method(method)
+      mapped = map_method(method)
+      raise ArgumentError.new("Invalid method") if mapped.nil?
+      mapped
+    end
+
+    def map_method(method)
       return "GET" if (method.strip().casecmp("GET") == 0)
       return "POST" if (method.strip().casecmp("POST") == 0)
       return "PUT" if (method.strip().casecmp("PUT") == 0)
       return "DELETE" if (method.strip().casecmp("DELETE") == 0)
-      raise ArgumentError.new("Invalid method")
+      nil
+    end
+
+    def validate_method(method)
+      raise ArgumentError.new("Invalid method") if method.nil? or method.strip == ""
     end
 
     def translate_type(type)

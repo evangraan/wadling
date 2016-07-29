@@ -4,7 +4,7 @@ Coveralls.wear!
 require 'rspec'
 require 'rspec/mocks'
 require 'tempfile'
-#require 'byebug'
+require 'byebug'
 
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'wadling'))
 $:.unshift(File.join(File.dirname(__FILE__), '..'))

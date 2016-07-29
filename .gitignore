@@ -5,3 +5,4 @@ Gemfile.lock
 backup
 doc
 prototype
+.byebug_history
